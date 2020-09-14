@@ -779,16 +779,14 @@ export default class Carousel extends Component {
         this._onScrollTriggered = true;
         this._lastScrollDate = Date.now();
 
-        if (this._activeItem !== nextActiveItem && this._shouldUseCustomAnimation()) {
+        if (this._shouldUseCustomAnimation()) {
             this._playCustomSlideAnimation(this._activeItem, nextActiveItem);
         }
 
         if (enableMomentum) {
             clearTimeout(this._snapNoMomentumTimeout);
 
-            if (this._activeItem !== nextActiveItem) {
-                this._activeItem = nextActiveItem;
-            }
+            this._activeItem = nextActiveItem;
 
             if (itemReached) {
                 if (this._canFireBeforeCallback) {
@@ -799,7 +797,7 @@ export default class Carousel extends Component {
                     this._onSnap(this._getDataIndex(nextActiveItem));
                 }
             }
-        } else if (this._activeItem !== nextActiveItem && itemReached) {
+        } else if (itemReached) {
             if (this._canFireBeforeCallback) {
                 this._onBeforeSnap(this._getDataIndex(nextActiveItem));
             }
@@ -1015,22 +1013,20 @@ export default class Carousel extends Component {
             index = itemsLength - 1;
         }
 
-        if (index !== this._previousActiveItem) {
-            this._previousActiveItem = index;
+        this._previousActiveItem = index;
 
-            // Placed here to allow overscrolling for edges items
-            if (lockScroll && this._canLockScroll()) {
-                this._lockScroll();
+        // Placed here to allow overscrolling for edges items
+        if (lockScroll && this._canLockScroll()) {
+            this._lockScroll();
+        }
+
+        if (fireCallback) {
+            if (onBeforeSnapToItem) {
+                this._canFireBeforeCallback = true;
             }
 
-            if (fireCallback) {
-                if (onBeforeSnapToItem) {
-                    this._canFireBeforeCallback = true;
-                }
-
-                if (onSnapToItem) {
-                    this._canFireCallback = true;
-                }
+            if (onSnapToItem) {
+                this._canFireCallback = true;
             }
         }
 
